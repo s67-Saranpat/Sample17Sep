@@ -1,35 +1,35 @@
-int[][] grid = new int[4][4]; // 4x4 grid
-boolean[][] revealed = new boolean[4][4]; // Track revealed cards
-int cellSize; // Size of each cell
+int[][] grid = new int[4][4]; 
+boolean[][] revealed = new boolean[4][4]; 
+int cellSize; 
 int firstCardRow = -1, firstCardCol = -1; 
-int secondCardRow = -1, secondCardCol = -1; // Track the second revealed card
-boolean secondCardRevealed = false; // Track if the second card is revealed
-int revealDelay = 1000; // Delay in milliseconds to hide cards
-int lastRevealTime = 0; // Time of last reveal
+int secondCardRow = -1, secondCardCol = -1; 
+boolean secondCardRevealed = false; 
+int revealDelay = 1000; 
+int lastRevealTime = 0; 
 
 void setup() {
     size(500, 500);
-    cellSize = width / 4; // Calculate cell size
-    initializeGrid(); // Initialize the grid with numbers
+    cellSize = width / 4; 
+    initializeGrid(); 
 }
 
 void draw() {
     background(255);
-    drawGrid(); // Draw the grid with numbers
+    drawGrid(); 
     
-    // Check if the second card has been revealed and if the delay has passed
+    
     if (secondCardRevealed && millis() - lastRevealTime > revealDelay) {
-        // Hide both cards if they do not match
+        
         if (grid[firstCardRow][firstCardCol] != grid[secondCardRow][secondCardCol]) {
-            revealed[firstCardRow][firstCardCol] = false; // Hide the first card
-            revealed[secondCardRow][secondCardCol] = false; // Hide the second card
+            revealed[firstCardRow][firstCardCol] = false; 
+            revealed[secondCardRow][secondCardCol] = false; 
         }
-        // Reset the tracking variables
+        
         firstCardRow = -1;
         firstCardCol = -1;
         secondCardRow = -1;
         secondCardCol = -1;
-        secondCardRevealed = false; // Reset second card state
+        secondCardRevealed = false; 
     }
 }
 
@@ -61,33 +61,33 @@ void drawGrid() {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             fill(255); // Default fill color for boxes
-            rect(j * cellSize, i * cellSize, cellSize, cellSize); // Draw the cell
+            rect(j * cellSize, i * cellSize, cellSize, cellSize); 
             if (revealed[i][j]) {
                 fill(0); // Change fill color for revealed numbers
                 textSize(32);
                 textAlign(CENTER, CENTER);
-                text(grid[i][j], j * cellSize + cellSize / 2, i * cellSize + cellSize / 2); // Display the number
+                text(grid[i][j], j * cellSize + cellSize / 2, i * cellSize + cellSize / 2); 
             }
         }
     }
 }
 
 void mousePressed() {
-    int col = mouseX / cellSize; // Determine which column was clicked
-    int row = mouseY / cellSize; // Determine which row was clicked
+    int col = mouseX / cellSize; 
+    int row = mouseY / cellSize; 
     if (col < 4 && row < 4 && !revealed[row][col]) {
         // If this is the first card being revealed
         if (firstCardRow == -1) {
             firstCardRow = row;
             firstCardCol = col;
-            revealed[row][col] = true; // Reveal the first card
+            revealed[row][col] = true; 
         } else {
             // If this is the second card being revealed
             secondCardRow = row;
             secondCardCol = col;
-            revealed[row][col] = true; // Reveal the second card
-            secondCardRevealed = true; // Mark that the second card is revealed
-            lastRevealTime = millis(); // Record the time when the second card was revealed
+            revealed[row][col] = true;
+            secondCardRevealed = true; 
+            lastRevealTime = millis(); 
         }
     }
 }
