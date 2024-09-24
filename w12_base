@@ -1,6 +1,11 @@
 int[][] grid = new int[4][4]; // 4x4 grid
 boolean[][] revealed = new boolean[4][4]; // Track revealed cards
 int cellSize; // Size of each cell
+int firstCardRow = -1, firstCardCol = -1; 
+int secondCardRow = -1, secondCardCol = -1; // Track the second revealed card
+boolean secondCardRevealed = false; // Track if the second card is revealed
+int revealDelay = 1000; // Delay in milliseconds to hide cards
+int lastRevealTime = 0; // Time of last reveal
 
 void setup() {
     size(500, 500);
@@ -11,6 +16,21 @@ void setup() {
 void draw() {
     background(255);
     drawGrid(); // Draw the grid with numbers
+    
+    // Check if the second card has been revealed and if the delay has passed
+    if (secondCardRevealed && millis() - lastRevealTime > revealDelay) {
+        // Hide both cards if they do not match
+        if (grid[firstCardRow][firstCardCol] != grid[secondCardRow][secondCardCol]) {
+            revealed[firstCardRow][firstCardCol] = false; // Hide the first card
+            revealed[secondCardRow][secondCardCol] = false; // Hide the second card
+        }
+        // Reset the tracking variables
+        firstCardRow = -1;
+        firstCardCol = -1;
+        secondCardRow = -1;
+        secondCardCol = -1;
+        secondCardRevealed = false; // Reset second card state
+    }
 }
 
 void initializeGrid() {
@@ -28,24 +48,18 @@ void initializeGrid() {
 
     // Fill the grid with shuffled numbers
     int index = 0;
-    int row = 0;
-    while (row < 4) {
-        int col = 0;
-        while (col < 4) {
+    for (int row = 0; row < 4; row++) {
+        for (int col = 0; col < 4; col++) {
             grid[row][col] = numbers[index];
             index++;
-            col++;
         }
-        row++;
     }
 }
 
 void drawGrid() {
     stroke(0); // Set stroke color for grid lines
-    int i = 0;
-    while (i < 4) {
-        int j = 0;
-        while (j < 4) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
             fill(255); // Default fill color for boxes
             rect(j * cellSize, i * cellSize, cellSize, cellSize); // Draw the cell
             if (revealed[i][j]) {
@@ -54,17 +68,26 @@ void drawGrid() {
                 textAlign(CENTER, CENTER);
                 text(grid[i][j], j * cellSize + cellSize / 2, i * cellSize + cellSize / 2); // Display the number
             }
-            j++;
         }
-        i++;
     }
 }
 
-// Example: You can add mousePressed to reveal cards based on mouse clicks
 void mousePressed() {
     int col = mouseX / cellSize; // Determine which column was clicked
     int row = mouseY / cellSize; // Determine which row was clicked
-    if (col < 4 && row < 4) {
-        revealed[row][col] = !revealed[row][col]; // Toggle revealed state
+    if (col < 4 && row < 4 && !revealed[row][col]) {
+        // If this is the first card being revealed
+        if (firstCardRow == -1) {
+            firstCardRow = row;
+            firstCardCol = col;
+            revealed[row][col] = true; // Reveal the first card
+        } else {
+            // If this is the second card being revealed
+            secondCardRow = row;
+            secondCardCol = col;
+            revealed[row][col] = true; // Reveal the second card
+            secondCardRevealed = true; // Mark that the second card is revealed
+            lastRevealTime = millis(); // Record the time when the second card was revealed
+        }
     }
 }
